@@ -11,7 +11,7 @@ router.get('/', function(request,response){
         <h2>${title}</h2>${description}
         <img src="/images/Todolist.jpg" style="width:300px; display:block; margin-top:10px;">
         `,
-        `<a href="/todo/add">add</a>`
+        `<a href="/todo/create">create</a>`
     );
     response.send(html);
     });

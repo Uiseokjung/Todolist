@@ -5,8 +5,8 @@ var template = require('./lib/template.js')
 // var qs = require('querystring')
 var bodyParser = require('body-parser')
 var compression = require('compression')
-var topicRouter = require('./routes/add.js')
-var indexRouter = require('./routes/index')
+var todoRouter = require('./routes/todo.js')
+var indexRouter = require('./routes/index.js')
 var helmet = require('helmet')
 
 app.use(helmet())
@@ -22,7 +22,7 @@ app.get(`*`, function(request, response, next){
 
 app.use(bodyParser.urlencoded({ extended: false}));
 
-app.use('/topic', topicRouter)
+app.use('/todo', todoRouter)
 app.use('/', indexRouter)
 
 app.use(function(request, response, next){

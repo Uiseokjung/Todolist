@@ -6,14 +6,14 @@ var sanitizeHtml = require('sanitize-html')
 var template = require('../lib/template.js')
 
 
-router.get('/add', function(request, response){
-    var title = 'Todo - add';
+router.get('/create', function(request, response){
+    var title = 'TodoList - create';
      var list = template.list(request.list);
      var html = template.HTML(title, list, `
-       <form action="/todo/add_process" method="post">
-         <p><input type="text" name="title" placeholder="title"></p>
+       <form action="/todo/create_process" method="post">
+         <p><input type="text" name="title" placeholder="Todo"></p>
          <p>
-           <textarea name="description" placeholder="description"></textarea>
+           <textarea name="description" placeholder="description of Your Todo"></textarea>
          </p>
          <p>
            <input type="submit">
@@ -23,34 +23,34 @@ router.get('/add', function(request, response){
      response.send(html);
   });
   
-router.post('/add_process', function(request, response){
+router.post('/create_process', function(request, response){
     var post = request.body;
-    var Todo = post.title;
-    var TodoDesc = post.description;
-    fs.writeFile(`data/${Todo}`, TodoDesc, 'utf8', function(err){
-      response.redirect(`/Todo/${Todo}`);
+    var title = post.title;
+    var description = post.description;
+    fs.writeFile(`data/${title}`, description, 'utf8', function(err){
+      response.redirect(`/todo/${title}`);
              })
   });
   
 router.get('/modify/:pageId', function(request, response){
     var filteredId = path.parse(request.params.pageId).base;
-    fs.readFile(`data/${filteredId}`, 'utf8', function(err, TodoDesc){
-      var Todo = request.params.pageId;
+    fs.readFile(`data/${filteredId}`, 'utf8', function(err, description){
+      var title = request.params.pageId;
       var list = template.list(request.list);
       var html = template.HTML(title, list,
         `
-        <form action="/topic/update_process" method="post">
-          <input type="hidden" name="id" value="${Todo}">
-          <p><input type="text" name="title" placeholder="title" value="${Todo}"></p>
+        <form action="/todo/modify_process" method="post">
+          <input type="hidden" name="id" value="${title}">
+          <p><input type="text" name="title" placeholder="title" value="${title}"></p>
           <p>
-            <textarea name="description" placeholder="description">${TodoDesc}</textarea>
+            <textarea name="description" placeholder="description">${description}</textarea>
           </p>
           <p>
             <input type="submit">
           </p>
         </form>
         `,
-        `<a href="/todo/add">add</a> <a href="/todo/modify?id=${Todo}">modify</a>`
+        `<a href="/todo/create">create</a> <a href="/todo/modify?id=${title}">modify</a>`
       );
       response.send(html);
     });
@@ -61,9 +61,9 @@ router.post('/modify_process', function(request, response){
       var id = post.id;
       var title = post.title;
       var description = post.description;
-      fs.rename(`data/${id}`, `data/${Todo}`, function(error){
-        fs.writeFile(`data/${Todo}`, TodoDesc, 'utf8', function(err){
-          response.redirect(`/todo/${Todo}`);
+      fs.rename(`data/${id}`, `data/${title}`, function(error){
+        fs.writeFile(`data/${title}`, description, 'utf8', function(err){
+          response.redirect(`/todo/${title}`);
         });
       });
   });
@@ -79,22 +79,22 @@ router.post('/delete_process', function(request, response){
   
 router.get('/:pageId', function(request,response,next){
                     var filteredId = path.parse(request.params.pageId).base;
-                    fs.readFile(`data/${filteredId}`, 'utf8', function(err, TodoDesc){
+                    fs.readFile(`data/${filteredId}`, 'utf8', function(err, description){
                     if(err){ 
                         next(err)
                     } else{
-                      var Todo = request.params.pageId;
-                       var sanitizedTodo = sanitizeHtml(Todo);
-                       var sanitizedDescription = sanitizeHtml(TodoDesc, {
+                      var title = request.params.pageId;
+                       var sanitizedTitle = sanitizeHtml(title);
+                       var sanitizedDescription = sanitizeHtml(description, {
                          allowedTags:['h1']
                        });
                        var list = template.list(request.list);
-                       var html = template.HTML(sanitizedTodo, list,
-                         `<h2>${sanitizedTodo}</h2>${sanitizedDescription}`,
-                         ` <a href="/todo/add">add</a>
-                           <a href="/todo/modify/${sanitizedTodo}">modify</a>
+                       var html = template.HTML(sanitizedTitle, list,
+                         `<h2>${sanitizedTitle}</h2>${sanitizedDescription}`,
+                         ` <a href="/todo/create">create</a>
+                           <a href="/todo/modify/${sanitizedTitle}">modify</a>
                            <form action="/todo/delete_process" method="post">
-                             <input type="hidden" name="id" value="${sanitizedTodo}">
+                             <input type="hidden" name="id" value="${sanitizedTitle}">
                              <input type="submit" value="delete">
                            </form>`
                        );
